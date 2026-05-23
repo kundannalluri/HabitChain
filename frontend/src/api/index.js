@@ -33,6 +33,8 @@ export const authApi = {
   getStats: () => api.get('/users/me/stats'),
   getBadges: () => api.get('/users/me/badges'),
   getLeaderboard: () => api.get('/users/leaderboard/'),
+  updateProfile: (data) => api.put('/users/me/profile', data),
+  updatePreferences: (data) => api.put('/users/me/preferences', data),
 };
 
 export default api;

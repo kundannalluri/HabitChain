@@ -34,7 +34,7 @@ const ForgotPassword = () => {
     setLoading(true);
     setError('');
     try {
-      await api.post('/reset-password', { identifier, new_password: newPassword });
+      await api.post('/forgot-password', { identifier, new_password: newPassword });
       setStep(3);
     } catch (err) {
       setError(err.response?.data?.detail || 'User not found. Please check your username or email.');

@@ -29,24 +29,24 @@ const CalendarView = ({ history = [], title = "Monthly History" }) => {
   };
 
   return (
-    <div className="glass-card" style={{ padding: '1.5rem' }}>
+    <div className="glass-card" style={{ padding: '2rem', borderRadius: '1.5rem', background: '#fff', boxShadow: 'var(--shadow-md)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
         <h3 style={{ fontWeight: '700', fontSize: '1.125rem', margin: 0 }}>{title}</h3>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <button onClick={prevMonth} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '0.25rem', borderRadius: '0.5rem' }} className="hover:bg-white/5">
-            <ChevronLeft size={20} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', background: 'var(--bg-elevated)', padding: '0.25rem', borderRadius: '1rem' }}>
+          <button onClick={prevMonth} style={{ background: 'white', border: '1px solid var(--border-default)', color: 'var(--text-main)', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '0.4rem', borderRadius: '0.75rem', boxShadow: 'var(--shadow-sm)', transition: 'all 0.2s' }} className="btn">
+            <ChevronLeft size={18} />
           </button>
-          <span style={{ color: 'var(--text-main)', fontSize: '0.875rem', fontWeight: 600, minWidth: '110px', textAlign: 'center' }}>
+          <span style={{ color: 'var(--text-main)', fontSize: '0.95rem', fontWeight: 700, minWidth: '120px', textAlign: 'center' }}>
             {monthNames[month]} {year}
           </span>
-          <button onClick={nextMonth} disabled={month === now.getMonth() && year === now.getFullYear()} style={{ background: 'none', border: 'none', color: month === now.getMonth() && year === now.getFullYear() ? 'rgba(255,255,255,0.1)' : 'var(--text-muted)', cursor: month === now.getMonth() && year === now.getFullYear() ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', padding: '0.25rem', borderRadius: '0.5rem' }} className="hover:bg-white/5">
-            <ChevronRight size={20} />
+          <button onClick={nextMonth} disabled={month === now.getMonth() && year === now.getFullYear()} style={{ background: month === now.getMonth() && year === now.getFullYear() ? 'transparent' : 'white', border: month === now.getMonth() && year === now.getFullYear() ? 'none' : '1px solid var(--border-default)', color: month === now.getMonth() && year === now.getFullYear() ? 'var(--text-muted)' : 'var(--text-main)', cursor: month === now.getMonth() && year === now.getFullYear() ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', padding: '0.4rem', borderRadius: '0.75rem', boxShadow: month === now.getMonth() && year === now.getFullYear() ? 'none' : 'var(--shadow-sm)', transition: 'all 0.2s' }} className="btn">
+            <ChevronRight size={18} />
           </button>
         </div>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.5rem' }}>
-        {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, index) => (
-          <div key={`${day}-${index}`} style={{ textAlign: 'center', fontSize: '0.75rem', color: 'var(--text-muted)', paddingBottom: '0.5rem' }}>
+        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, index) => (
+          <div key={`${day}-${index}`} style={{ textAlign: 'center', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-sub)', paddingBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             {day}
           </div>
         ))}
@@ -59,18 +59,18 @@ const CalendarView = ({ history = [], title = "Monthly History" }) => {
           return (
             <div key={day} style={{
               aspectRatio: '1',
-              borderRadius: '6px',
-              background: isCompleted ? 'rgba(16, 185, 129, 0.4)' : (isToday ? 'rgba(99, 102, 241, 0.8)' : 'rgba(255, 255, 255, 0.05)'),
-              border: isCompleted ? '1px solid var(--success)' : (isToday ? '2px solid var(--primary)' : '1px solid var(--glass-border)'),
+              borderRadius: '12px',
+              background: isCompleted ? 'linear-gradient(135deg, var(--success) 0%, #059669 100%)' : (isToday ? 'linear-gradient(135deg, var(--primary) 0%, #4338ca 100%)' : 'var(--bg-elevated)'),
+              border: isCompleted || isToday ? 'none' : '1px solid var(--border-subtle)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: isToday ? '0.875rem' : '0.75rem',
-              color: isCompleted || isToday ? 'white' : 'var(--text-muted)',
+              fontSize: '0.9rem',
+              color: isCompleted || isToday ? 'white' : 'var(--text-main)',
               cursor: 'pointer',
-              transition: 'all 0.2s',
-              fontWeight: isToday ? '800' : 'normal',
-              boxShadow: isToday ? '0 0 10px rgba(99, 102, 241, 0.4)' : 'none'
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+              fontWeight: isCompleted || isToday ? '700' : '500',
+              boxShadow: isCompleted ? '0 4px 12px rgba(16, 185, 129, 0.3)' : (isToday ? '0 4px 12px rgba(99, 102, 241, 0.3)' : 'none')
             }}
             onMouseEnter={(e) => e.target.style.transform = 'scale(1.1)'}
             onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}

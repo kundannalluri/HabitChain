@@ -44,6 +44,14 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(database.get_db)
 async def read_users_me(current_user: models.User = Depends(auth.get_current_user)):
     return current_user
 
+@app.put("/users/me/profile", response_model=schemas.UserResponse)
+def update_user_profile(profile_data: schemas.UserUpdate, db: Session = Depends(database.get_db), current_user: models.User = Depends(auth.get_current_user)):
+    return crud.update_user_profile(db, current_user.id, profile_data)
+
+@app.put("/users/me/preferences", response_model=schemas.UserResponse)
+def update_user_preferences(prefs_data: schemas.PreferencesUpdate, db: Session = Depends(database.get_db), current_user: models.User = Depends(auth.get_current_user)):
+    return crud.update_user_preferences(db, current_user.id, prefs_data)
+
 @app.post("/habits/", response_model=schemas.HabitResponse)
 def create_habit(habit: schemas.HabitCreate, db: Session = Depends(database.get_db), current_user: models.User = Depends(auth.get_current_user)):
     return crud.create_habit(db=db, habit=habit, user_id=current_user.id)
@@ -111,36 +119,36 @@ def get_leaderboard(limit: int = 10, db: Session = Depends(database.get_db)):
 
 class PasswordResetRequest(BaseModel):
     new_password: str
-    identifier: str = ""  # username or email — only used when NOT authenticated (forgot-password flow)
 
 @app.post("/reset-password")
 def reset_password(
     payload: PasswordResetRequest,
     db: Session = Depends(database.get_db),
-    token: str = Depends(auth.oauth2_scheme)
+    current_user: models.User = Depends(auth.get_current_user)
 ):
-    """Works in two modes:
-    1. Authenticated (Profile page): uses the JWT token to identify the user.
-    2. Unauthenticated (Forgot Password): uses identifier (username or email).
     """
-    user = None
-    try:
-        # Try to resolve user from token first
-        from jose import jwt, JWTError
-        payload_data = jwt.decode(token, auth.SECRET_KEY, algorithms=[auth.ALGORITHM])
-        username = payload_data.get("sub")
-        if username:
-            user = crud.get_user_by_username(db, username)
-    except Exception:
-        pass
-
-    # Fallback to identifier if token lookup failed or user not found
-    if not user and payload.identifier:
-        user = crud.get_user_by_username_or_email(db, payload.identifier)
-
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found. Please check your username or email.")
-
-    user.hashed_password = auth.get_password_hash(payload.new_password)
+    Allows an authenticated user to change their password.
+    """
+    current_user.hashed_password = auth.get_password_hash(payload.new_password)
     db.commit()
     return {"message": "Password changed successfully"}
+
+class ForgotPasswordRequest(BaseModel):
+    identifier: str
+    new_password: str
+
+@app.post("/forgot-password")
+def forgot_password(
+    payload: ForgotPasswordRequest,
+    db: Session = Depends(database.get_db)
+):
+    """
+    Allows a user to reset their password using their username or email without being authenticated.
+    """
+    user = crud.get_user_by_username_or_email(db, payload.identifier)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+        
+    user.hashed_password = auth.get_password_hash(payload.new_password)
+    db.commit()
+    return {"message": "Password reset successfully"}

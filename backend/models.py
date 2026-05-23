@@ -22,6 +22,9 @@ class User(Base):
     hashed_password = Column(String(255))
     points = Column(Integer, default=0)
     level = Column(Integer, default=1)
+    bio = Column(Text, nullable=True)
+    email_notifs = Column(Boolean, default=True)
+    dark_mode = Column(Boolean, default=False)
     created_at = Column(DateTime, server_default=func.now())
 
     habits = relationship("Habit", back_populates="owner")

@@ -63,6 +63,8 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedHabitHistory, setSelectedHabitHistory] = useState(null);
+  const [categoryFilter, setCategoryFilter] = useState('All');
+  const [sortOption, setSortOption] = useState('Default');
 
   const fetchDashboardData = useCallback(async () => {
     try {
@@ -235,11 +237,11 @@ const Dashboard = () => {
           <h1 style={{
             fontFamily: 'var(--font-serif)',
             fontSize: 'clamp(1.8rem, 3vw, 2.4rem)',
-            fontWeight: 400,
+            fontWeight: 800,
             letterSpacing: '-0.02em',
             marginBottom: '0.15rem'
           }}>
-            {getGreeting()}{user ? `, ${user.username}` : ''} 👋
+            {getGreeting()}{user ? <span className="text-gradient">, {user.username}</span> : ''} 👋
           </h1>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
             {stats.totalHabits === 0
@@ -334,23 +336,48 @@ const Dashboard = () => {
       <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1.5rem' }}>
         {/* Left: habits list */}
         <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '1rem' }}>
             <h2 style={{ fontSize: '1.05rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <CheckCircle2 size={17} color="var(--success)" /> Active Habits
             </h2>
-            <div style={{ display: 'flex', gap: '0.4rem' }}>
+            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+              <select 
+                value={categoryFilter} 
+                onChange={e => setCategoryFilter(e.target.value)}
+                style={{ padding: '0.4rem 0.8rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-default)', background: 'var(--bg-surface)', cursor: 'pointer', fontSize: '0.85rem' }}
+              >
+                <option value="All">All Categories</option>
+                <option value="Health">Health</option>
+                <option value="Work">Work</option>
+                <option value="Personal">Personal</option>
+                <option value="Learning">Learning</option>
+              </select>
+              
+              <select 
+                value={sortOption} 
+                onChange={e => setSortOption(e.target.value)}
+                style={{ padding: '0.4rem 0.8rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-default)', background: 'var(--bg-surface)', cursor: 'pointer', fontSize: '0.85rem' }}
+              >
+                <option value="Default">Sort: Default</option>
+                <option value="Streak">Sort: Highest Streak</option>
+                <option value="Progress">Sort: Highest Progress</option>
+                <option value="Name">Sort: Alphabetical</option>
+              </select>
+
+              <div style={{ width: '1px', height: '24px', background: 'var(--border-default)', margin: '0 0.25rem' }} />
+
               <button
                 onClick={() => setSelectedHabitHistory(null)}
                 style={{
                   padding: '0.35rem 0.85rem', fontSize: '0.8rem', borderRadius: '99px', border: 'none', cursor: 'pointer',
-                  background: !selectedHabitHistory ? 'var(--primary)' : 'rgba(255,255,255,0.05)',
+                  background: !selectedHabitHistory ? 'var(--primary)' : 'rgba(0,0,0,0.05)',
                   color: !selectedHabitHistory ? 'white' : 'var(--text-muted)'
                 }}
-              >All</button>
+              >All History</button>
               {selectedHabitHistory && (
                 <button style={{
                   padding: '0.35rem 0.85rem', fontSize: '0.8rem', borderRadius: '99px', border: 'none', cursor: 'pointer',
-                  background: 'rgba(255,255,255,0.05)', color: 'var(--text-sub)'
+                  background: 'rgba(0,0,0,0.05)', color: 'var(--text-sub)'
                 }}>
                   {selectedHabitHistory.name}
                 </button>
@@ -359,22 +386,50 @@ const Dashboard = () => {
           </div>
 
           <div className="habit-grid">
-            {habits.length > 0 ? (
-              habits.map(habit => (
-                <HabitCard
-                  key={habit.id}
-                  habit={habit}
-                  onComplete={handleComplete}
-                  onDelete={handleDelete}
-                  onShowHistory={(h) => setSelectedHabitHistory(h)}
-                />
-              ))
-            ) : (
-              <div className="glass-card" style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)', gridColumn: '1 / -1' }}>
-                <Target size={36} style={{ opacity: 0.2, marginBottom: '1rem' }} />
-                <p>No habits yet — add one to begin your journey!</p>
-              </div>
-            )}
+            {(() => {
+              const filteredHabits = habits
+                .filter(h => categoryFilter === 'All' || h.category === categoryFilter)
+                .sort((a, b) => {
+                  const getProgress = (h) => h.completions ? h.completions.reduce((acc, c) => acc + c.progress_value, 0) : 0;
+                  const getStreak = (h) => {
+                    if (!h.completions || h.completions.length === 0) return 0;
+                    const dates = h.completions.map(c => new Date(c.date).setHours(0,0,0,0)).sort((x,y) => y - x);
+                    let streak = 1;
+                    let current = dates[0];
+                    const today = new Date().setHours(0,0,0,0);
+                    if (today - current > 86400000) return 0; // streak broken
+                    for (let i = 1; i < dates.length; i++) {
+                      if (current - dates[i] === 86400000) {
+                        streak++;
+                        current = dates[i];
+                      } else if (current - dates[i] > 86400000) break;
+                    }
+                    return streak;
+                  };
+
+                  if (sortOption === 'Streak') return getStreak(b) - getStreak(a);
+                  if (sortOption === 'Progress') return getProgress(b) - getProgress(a);
+                  if (sortOption === 'Name') return a.name.localeCompare(b.name);
+                  return 0;
+                });
+
+              return filteredHabits.length > 0 ? (
+                filteredHabits.map(habit => (
+                  <HabitCard
+                    key={habit.id}
+                    habit={habit}
+                    onComplete={handleComplete}
+                    onDelete={handleDelete}
+                    onShowHistory={(h) => setSelectedHabitHistory(h)}
+                  />
+                ))
+              ) : (
+                <div className="glass-card" style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)', gridColumn: '1 / -1' }}>
+                  <Target size={36} style={{ opacity: 0.2, marginBottom: '1rem' }} />
+                  <p>No habits match your filters.</p>
+                </div>
+              );
+            })()}
           </div>
         </div>
 

@@ -65,3 +65,25 @@ def create_completion(db: Session, completion: schemas.CompletionCreate):
 
 def get_completions_for_habit(db: Session, habit_id: int):
     return db.query(models.Completion).filter(models.Completion.habit_id == habit_id).all()
+
+def update_user_profile(db: Session, user_id: int, profile_data: schemas.UserUpdate):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if user:
+        if profile_data.username is not None:
+            user.username = profile_data.username
+        if profile_data.bio is not None:
+            user.bio = profile_data.bio
+        db.commit()
+        db.refresh(user)
+    return user
+
+def update_user_preferences(db: Session, user_id: int, prefs_data: schemas.PreferencesUpdate):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if user:
+        if prefs_data.email_notifs is not None:
+            user.email_notifs = prefs_data.email_notifs
+        if prefs_data.dark_mode is not None:
+            user.dark_mode = prefs_data.dark_mode
+        db.commit()
+        db.refresh(user)
+    return user

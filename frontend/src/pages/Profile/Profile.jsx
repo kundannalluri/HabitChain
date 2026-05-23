@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { authApi } from '../../api';
-import { User, Award, Zap, Target, LogOut, Key, TrendingUp, Calendar, Flame, Shield } from 'lucide-react';
+import { User, Award, Zap, Target, LogOut, Key, TrendingUp, Calendar, Flame, Shield, Edit3, Settings, Bell, Moon } from 'lucide-react';
 import axios from 'axios';
 
 const API_URL = 'http://localhost:8000';
@@ -12,6 +12,9 @@ const Profile = () => {
   const [stats, setStats] = useState(null);
   const [badges, setBadges] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isEditProfile, setIsEditProfile] = useState(false);
+  const [editForm, setEditForm] = useState({ username: '', bio: '' });
+  const [prefs, setPrefs] = useState({ emailNotifs: true, darkMode: false });
 
   // Change Password
   const [showChangePassword, setShowChangePassword] = useState(false);
@@ -27,6 +30,8 @@ const Profile = () => {
           authApi.getBadges()
         ]);
         setUser(userRes.data);
+        setEditForm({ username: userRes.data.username || '', bio: userRes.data.bio || '' });
+        setPrefs({ emailNotifs: userRes.data.email_notifs !== false, darkMode: userRes.data.dark_mode === true });
         setStats(statsRes.data);
         setBadges(badgesRes.data);
       } catch (error) {
@@ -41,6 +46,31 @@ const Profile = () => {
   const handleLogout = () => {
     localStorage.removeItem('token');
     navigate('/login');
+  };
+
+  const handleSaveProfile = async () => {
+    try {
+      const res = await authApi.updateProfile(editForm);
+      setUser(res.data);
+      setIsEditProfile(false);
+    } catch (err) {
+      console.error("Failed to update profile", err);
+    }
+  };
+
+  const handleTogglePref = async (key) => {
+    try {
+      const updatedPrefs = { ...prefs, [key]: !prefs[key] };
+      setPrefs(updatedPrefs);
+      await authApi.updatePreferences({
+        email_notifs: updatedPrefs.emailNotifs,
+        dark_mode: updatedPrefs.darkMode
+      });
+    } catch (err) {
+      console.error("Failed to update preferences", err);
+      // Revert on error
+      setPrefs(prefs);
+    }
   };
 
   const handleChangePassword = async (e) => {
@@ -97,13 +127,20 @@ const Profile = () => {
       {/* ─── Header ─── */}
       <header className="glass-card" style={{ padding: '3rem', borderRadius: '2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem', flexWrap: 'wrap', gap: '1.5rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '2.5rem', flexWrap: 'wrap' }}>
-          <div style={{ width: '120px', height: '120px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary), var(--secondary))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', flexShrink: 0 }}>
-            <User size={64} />
+          <div className="avatar-ring" style={{ width: '120px', height: '120px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary), var(--primary-light))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
+              <User size={60} />
+            </div>
           </div>
           <div>
             <h1 style={{ fontSize: '2.5rem', fontWeight: '800', marginBottom: '0.25rem' }}>{user?.username}</h1>
-            <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', marginBottom: '1rem' }}>{user?.email}</p>
-            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+            <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', marginBottom: '0.5rem' }}>{user?.email}</p>
+            {user?.bio && (
+              <p style={{ color: 'var(--text-main)', fontSize: '0.95rem', marginBottom: '1.25rem', maxWidth: '500px', lineHeight: '1.5' }}>
+                {user.bio}
+              </p>
+            )}
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginTop: user?.bio ? '0' : '1rem' }}>
               <span style={{ padding: '0.4rem 1.2rem', borderRadius: '2rem', background: 'rgba(99,102,241,0.2)', color: 'var(--primary)', fontWeight: '700' }}>
                 🏅 Level {user?.level}
               </span>
@@ -117,6 +154,10 @@ const Profile = () => {
           </div>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          <button onClick={() => setIsEditProfile(p => !p)} className="btn glass-card"
+            style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--text-main)', padding: '0.85rem 1.75rem' }}>
+            <Edit3 size={18} /> Edit Profile
+          </button>
           <button onClick={() => setShowChangePassword(p => !p)} className="btn glass-card"
             style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--primary)', padding: '0.85rem 1.75rem' }}>
             <Key size={18} /> Change Password
@@ -127,6 +168,33 @@ const Profile = () => {
           </button>
         </div>
       </header>
+
+      {/* ─── Edit Profile Panel ─── */}
+      {isEditProfile && (
+        <div className="glass-card" style={{ padding: '2rem', borderRadius: '1.5rem', marginBottom: '2rem', border: '1px solid rgba(16,185,129,0.3)' }}>
+          <h3 style={{ fontSize: '1.2rem', fontWeight: '700', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <Edit3 size={20} color="var(--success)" /> Edit Profile
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: '400px' }}>
+            <div>
+              <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.4rem', display: 'block' }}>Username</label>
+              <input type="text" value={editForm.username} onChange={e => setEditForm(p => ({ ...p, username: e.target.value }))} className="input" style={{ background: 'var(--bg-elevated)' }} />
+            </div>
+            <div>
+              <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.4rem', display: 'block' }}>Bio</label>
+              <textarea value={editForm.bio} onChange={e => setEditForm(p => ({ ...p, bio: e.target.value }))} placeholder="Write a short bio..." className="input" style={{ background: 'var(--bg-elevated)', minHeight: '80px', resize: 'vertical' }}></textarea>
+            </div>
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+              <button className="btn" style={{ background: 'var(--success)', color: 'white', padding: '0.75rem 1.5rem', borderRadius: '0.75rem', fontWeight: '700' }} onClick={handleSaveProfile}>
+                Save Changes
+              </button>
+              <button className="btn glass-card" onClick={() => setIsEditProfile(false)}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ─── Change Password Panel ─── */}
       {showChangePassword && (
@@ -222,6 +290,40 @@ const Profile = () => {
                 onMouseEnter={e => e.currentTarget.style.background = 'rgba(244,63,94,0.2)'}
                 onMouseLeave={e => e.currentTarget.style.background = 'rgba(244,63,94,0.1)'}>
                 🚪 Sign Out
+              </div>
+            </div>
+          </div>
+
+          {/* Preferences */}
+          <div className="glass-card" style={{ padding: '2rem' }}>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: '700', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <Settings size={18} color="var(--text-sub)" /> Preferences
+            </h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <Bell size={18} color="var(--primary)" />
+                  <span style={{ fontWeight: '600' }}>Email Notifications</span>
+                </div>
+                <button 
+                  onClick={() => handleTogglePref('emailNotifs')}
+                  style={{ width: '44px', height: '24px', background: prefs.emailNotifs ? 'var(--primary)' : 'var(--border-strong)', borderRadius: '99px', position: 'relative', border: 'none', cursor: 'pointer', transition: 'background 0.3s' }}
+                >
+                  <div style={{ width: '18px', height: '18px', background: '#fff', borderRadius: '50%', position: 'absolute', top: '3px', left: prefs.emailNotifs ? '23px' : '3px', transition: 'left 0.3s', boxShadow: '0 1px 3px rgba(0,0,0,0.2)' }} />
+                </button>
+              </div>
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <Moon size={18} color="var(--text-sub)" />
+                  <span style={{ fontWeight: '600' }}>Dark Mode</span>
+                </div>
+                <button 
+                  onClick={() => handleTogglePref('darkMode')}
+                  style={{ width: '44px', height: '24px', background: prefs.darkMode ? 'var(--primary)' : 'var(--border-strong)', borderRadius: '99px', position: 'relative', border: 'none', cursor: 'pointer', transition: 'background 0.3s' }}
+                >
+                  <div style={{ width: '18px', height: '18px', background: '#fff', borderRadius: '50%', position: 'absolute', top: '3px', left: prefs.darkMode ? '23px' : '3px', transition: 'left 0.3s', boxShadow: '0 1px 3px rgba(0,0,0,0.2)' }} />
+                </button>
               </div>
             </div>
           </div>

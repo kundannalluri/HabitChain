@@ -14,7 +14,21 @@ class UserResponse(UserBase):
     id: int
     points: int
     level: int
+    bio: Optional[str] = None
+    email_notifs: bool = True
+    dark_mode: bool = False
     created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class UserUpdate(BaseModel):
+    username: Optional[str] = None
+    bio: Optional[str] = None
+
+class PreferencesUpdate(BaseModel):
+    email_notifs: Optional[bool] = None
+    dark_mode: Optional[bool] = None
 
     class Config:
         from_attributes = True
