@@ -59,7 +59,7 @@ const AddHabitModal = ({ isOpen, onClose, onHabitAdded }) => {
       left: 0,
       right: 0,
       bottom: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.6)',
+      backgroundColor: 'rgba(7, 6, 6, 0.6)',
       backdropFilter: 'blur(8px)',
       display: 'flex',
       alignItems: 'center',
@@ -105,7 +105,7 @@ const AddHabitModal = ({ isOpen, onClose, onHabitAdded }) => {
               type="text"
               required
               className="glass-card"
-              style={{ padding: '1rem', width: '100%', border: '1px solid rgba(255,255,255,0.1)', color: 'white', backgroundColor: 'rgba(255,255,255,0.05)' }}
+              style={{ padding: '1rem', width: '100%', border: '1px solid rgba(0,0,0,0.1)', color: 'black', backgroundColor: 'rgba(0,0,0,0.05)' }}
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               placeholder="e.g., Morning Meditation"
@@ -118,7 +118,7 @@ const AddHabitModal = ({ isOpen, onClose, onHabitAdded }) => {
             </label>
             <textarea
               className="glass-card"
-              style={{ padding: '1rem', width: '100%', border: '1px solid rgba(255,255,255,0.1)', color: 'white', backgroundColor: 'rgba(255,255,255,0.05)', minHeight: '80px', resize: 'vertical' }}
+              style={{ padding: '1rem', width: '100%', border: '1px solid rgba(0,0,0,0.1)', color: 'black', backgroundColor: 'rgba(0,0,0,0.05)', minHeight: '80px', resize: 'vertical' }}
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="What's this habit about?"
@@ -132,7 +132,7 @@ const AddHabitModal = ({ isOpen, onClose, onHabitAdded }) => {
               </label>
               <select
                 className="input-field"
-                style={{ padding: '0.875rem 1rem', width: '100%', background: 'var(--bg-elevated)', color: 'white', cursor: 'pointer' }}
+                style={{ padding: '0.875rem 1rem', width: '100%', background: 'var(--bg-elevated)', color: 'black', cursor: 'pointer' }}
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
               >
@@ -148,7 +148,7 @@ const AddHabitModal = ({ isOpen, onClose, onHabitAdded }) => {
               </label>
               <select
                 className="input-field"
-                style={{ padding: '0.875rem 1rem', width: '100%', background: 'var(--bg-elevated)', color: 'white', cursor: 'pointer' }}
+                style={{ padding: '0.875rem 1rem', width: '100%', background: 'var(--bg-elevated)', color: 'black', cursor: 'pointer' }}
                 value={formData.priority}
                 onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
               >
@@ -166,7 +166,7 @@ const AddHabitModal = ({ isOpen, onClose, onHabitAdded }) => {
               </label>
               <select
                 className="input-field"
-                style={{ padding: '0.875rem 1rem', width: '100%', background: 'var(--bg-elevated)', color: 'white', cursor: 'pointer' }}
+                style={{ padding: '0.875rem 1rem', width: '100%', background: 'var(--bg-elevated)', color: 'black', cursor: 'pointer' }}
                 value={formData.frequency}
                 onChange={(e) => setFormData({ ...formData, frequency: e.target.value })}
               >
@@ -199,7 +199,7 @@ const AddHabitModal = ({ isOpen, onClose, onHabitAdded }) => {
                     onChange={(e) => setFormData({ ...formData, goal_value: Math.max(1, parseInt(e.target.value) || 1) })}
                     style={{
                       width: '48px', padding: '0.875rem 0', textAlign: 'center',
-                      background: 'none', border: 'none', color: 'white',
+                      background: 'none', border: 'none', color: 'black',
                       fontSize: '1rem', fontWeight: 600,
                       outline: 'none', appearance: 'textfield', MozAppearance: 'textfield'
                     }}

@@ -18,13 +18,13 @@ const HabitCard = ({ habit, onComplete, onDelete, onShowHistory }) => {
           right: '1rem',
           background: 'none',
           border: 'none',
-          color: 'rgba(244, 63, 94, 0.4)',
+          color: 'rgba(0, 0, 0, 1)',
           cursor: 'pointer',
           transition: 'color 0.2s',
           zIndex: 10
         }}
-        onMouseEnter={(e) => e.target.style.color = 'rgba(244, 63, 94, 1)'}
-        onMouseLeave={(e) => e.target.style.color = 'rgba(244, 63, 94, 0.4)'}
+        onMouseEnter={(e) => e.target.style.color = 'rgba(0, 0, 0, 1)'}
+        onMouseLeave={(e) => e.target.style.color = 'rgba(0, 0, 0, 1)'}
       >
         <Trash2 size={18} />
       </button>
@@ -83,8 +83,8 @@ const HabitCard = ({ habit, onComplete, onDelete, onShowHistory }) => {
           <CheckCircle size={18} /> Complete
         </button>
         <button 
-          className="glass-card" 
-          style={{ width: '42px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
+          className="btn" 
+          style={{ width: '42px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}
           onClick={() => onShowHistory(habit)}
         >
           <Calendar size={18} />
