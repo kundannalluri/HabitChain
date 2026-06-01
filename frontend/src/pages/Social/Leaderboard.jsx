@@ -11,9 +11,10 @@ const Leaderboard = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
         const [leaderboardRes, meRes] = await Promise.all([
-          authApi.getLeaderboard(),
+          authApi.getLeaderboard(timeFilter),
           authApi.getMe()
         ]);
         setTopUsers(leaderboardRes.data);
@@ -25,7 +26,7 @@ const Leaderboard = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [timeFilter]);
 
   if (loading) return <div style={{ padding: '4rem', textAlign: 'center' }}>Loading rankings...</div>;
 
@@ -77,15 +78,7 @@ const Leaderboard = () => {
 
         {(() => {
           const filteredUsers = topUsers
-            .filter(u => u.username.toLowerCase().includes(searchQuery.toLowerCase()))
-            .map(u => {
-              // Mock time-scoped points for visual reactivity
-              let mockPoints = u.points;
-              if (timeFilter === 'This Month') mockPoints = Math.max(0, Math.floor(u.points * 0.45));
-              if (timeFilter === 'This Week') mockPoints = Math.max(0, Math.floor(u.points * 0.12));
-              return { ...u, displayPoints: mockPoints };
-            })
-            .sort((a, b) => b.displayPoints - a.displayPoints);
+            .filter(u => u.username.toLowerCase().includes(searchQuery.toLowerCase()));
 
           return filteredUsers.length > 0 ? filteredUsers.map((user, index) => {
           const isCurrentUser = user.id === currentUser?.id;
@@ -140,7 +133,7 @@ const Leaderboard = () => {
                 </span>
               </div>
               <span style={{ textAlign: 'right', fontWeight: '800', color: isCurrentUser ? 'var(--primary)' : 'var(--text-sub)' }}>
-                {user.displayPoints.toLocaleString()} XP
+                {user.points.toLocaleString()} XP
               </span>
             </div>
           );

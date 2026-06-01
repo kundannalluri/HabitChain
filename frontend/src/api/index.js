@@ -32,7 +32,7 @@ export const authApi = {
   getMe: () => api.get('/users/me/'),
   getStats: () => api.get('/users/me/stats'),
   getBadges: () => api.get('/users/me/badges'),
-  getLeaderboard: () => api.get('/users/leaderboard/'),
+  getLeaderboard: (timeFilter) => api.get('/users/leaderboard/', { params: { time_filter: timeFilter } }),
   updateProfile: (data) => api.put('/users/me/profile', data),
   updatePreferences: (data) => api.put('/users/me/preferences', data),
 };

@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from typing import List
-import models, schemas, crud, auth, database, gamification
+import models, schemas, crud, auth, database, gamification, social
 from database import engine
 
 app = FastAPI(title="HabitChain API")
@@ -114,8 +114,8 @@ async def read_user_badges(db: Session = Depends(database.get_db), current_user:
     return badges
 
 @app.get("/users/leaderboard/", response_model=List[schemas.UserResponse])
-def get_leaderboard(limit: int = 10, db: Session = Depends(database.get_db)):
-    return db.query(models.User).order_by(models.User.points.desc()).limit(limit).all()
+def get_leaderboard(limit: int = 10, time_filter: str = "All Time", db: Session = Depends(database.get_db)):
+    return social.get_leaderboard(db, limit, time_filter)
 
 class PasswordResetRequest(BaseModel):
     new_password: str

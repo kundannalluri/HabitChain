@@ -390,25 +390,8 @@ const Dashboard = () => {
               const filteredHabits = habits
                 .filter(h => categoryFilter === 'All' || h.category === categoryFilter)
                 .sort((a, b) => {
-                  const getProgress = (h) => h.completions ? h.completions.reduce((acc, c) => acc + c.progress_value, 0) : 0;
-                  const getStreak = (h) => {
-                    if (!h.completions || h.completions.length === 0) return 0;
-                    const dates = h.completions.map(c => new Date(c.date).setHours(0,0,0,0)).sort((x,y) => y - x);
-                    let streak = 1;
-                    let current = dates[0];
-                    const today = new Date().setHours(0,0,0,0);
-                    if (today - current > 86400000) return 0; // streak broken
-                    for (let i = 1; i < dates.length; i++) {
-                      if (current - dates[i] === 86400000) {
-                        streak++;
-                        current = dates[i];
-                      } else if (current - dates[i] > 86400000) break;
-                    }
-                    return streak;
-                  };
-
-                  if (sortOption === 'Streak') return getStreak(b) - getStreak(a);
-                  if (sortOption === 'Progress') return getProgress(b) - getProgress(a);
+                  if (sortOption === 'Streak') return (b.streak || 0) - (a.streak || 0);
+                  if (sortOption === 'Progress') return (b.progress || 0) - (a.progress || 0);
                   if (sortOption === 'Name') return a.name.localeCompare(b.name);
                   return 0;
                 });

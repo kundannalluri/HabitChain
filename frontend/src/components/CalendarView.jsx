@@ -14,9 +14,12 @@ const CalendarView = ({ history = [], title = "Monthly History" }) => {
   const blanks = Array.from({ length: startDay }, (_, i) => i);
   
   const completionDays = history
-    .map(dateStr => new Date(dateStr))
-    .filter(d => d.getMonth() === month && d.getFullYear() === year)
-    .map(d => d.getDate());
+    .filter(dateStr => {
+      if (!dateStr) return false;
+      const [y, m] = dateStr.split('-');
+      return parseInt(m, 10) - 1 === month && parseInt(y, 10) === year;
+    })
+    .map(dateStr => parseInt(dateStr.split('-')[2], 10));
 
   const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
