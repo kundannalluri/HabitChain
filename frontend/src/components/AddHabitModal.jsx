@@ -6,7 +6,7 @@ const AddHabitModal = ({ isOpen, onClose, onHabitAdded }) => {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    category: 'Healthy',
+    category: 'Health',
     priority: 'Medium',
     frequency: 'Daily',
     goal_value: 1,
@@ -28,7 +28,7 @@ const AddHabitModal = ({ isOpen, onClose, onHabitAdded }) => {
       setFormData({
         name: '',
         description: '',
-        category: 'Healthy',
+        category: 'Health',
         priority: 'Medium',
         frequency: 'Daily',
         goal_value: 1,
@@ -136,10 +136,10 @@ const AddHabitModal = ({ isOpen, onClose, onHabitAdded }) => {
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
               >
-                <option value="Healthy" style={{ background: 'var(--bg-surface)' }}>Healthy</option>
-                <option value="Productivity" style={{ background: 'var(--bg-surface)' }}>Productivity</option>
-                <option value="Wellness" style={{ background: 'var(--bg-surface)' }}>Wellness</option>
-                <option value="Growth" style={{ background: 'var(--bg-surface)' }}>Growth</option>
+                <option value="Health" style={{ background: 'var(--bg-surface)' }}>Health</option>
+                <option value="Work" style={{ background: 'var(--bg-surface)' }}>Work</option>
+                <option value="Personal" style={{ background: 'var(--bg-surface)' }}>Personal</option>
+                <option value="Learning" style={{ background: 'var(--bg-surface)' }}>Learning</option>
               </select>
             </div>
             <div style={{ display: 'grid', gap: '0.5rem' }}>
