@@ -2,10 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { authApi } from '../../api';
 import { User, Award, Zap, Target, LogOut, Key, TrendingUp, Calendar, Flame, Shield, Edit3, Settings, Bell, Moon } from 'lucide-react';
-import axios from 'axios';
-
-const API_URL = 'http://localhost:8000';
-
 const Profile = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
@@ -84,12 +80,7 @@ const Profile = () => {
       return;
     }
     try {
-      const token = localStorage.getItem('token');
-      await axios.post(
-        `${API_URL}/reset-password`,
-        { new_password: pwForm.newPw },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await authApi.resetPassword(pwForm.newPw);
       setPwStatus({ msg: 'Password changed successfully! ✓', isError: false });
       setPwForm({ current: '', newPw: '', confirm: '' });
       setTimeout(() => { setShowChangePassword(false); setPwStatus({ msg: '', isError: false }); }, 2000);

@@ -35,6 +35,7 @@ export const authApi = {
   getLeaderboard: (timeFilter) => api.get('/users/leaderboard/', { params: { time_filter: timeFilter } }),
   updateProfile: (data) => api.put('/users/me/profile', data),
   updatePreferences: (data) => api.put('/users/me/preferences', data),
+  resetPassword: (newPassword) => api.post('/reset-password', { new_password: newPassword }),
 };
 
 export default api;
